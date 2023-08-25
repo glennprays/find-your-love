@@ -2,6 +2,7 @@ from pygame.locals import *
 from pgzero.actor import Actor
 from pgzero.loaders import sounds
 import pygame
+from pgzero import clock
 
 TILE_SIZE = 32 
 WIDTH = 20 * TILE_SIZE 
@@ -43,7 +44,6 @@ maze = [
 ] 
 
 
-
 def draw():
     screen.clear()
 
@@ -62,16 +62,29 @@ def create_map():
                 screen.blit('dirt_block', (current_x, current_y))
 
 def move_up():
-    mimi.y -= TILE_SIZE
+    target = mimi.y - TILE_SIZE
+    if target > 0:
+        mimi.y = target
 def move_down():
-    mimi.y += TILE_SIZE
+    target = mimi.y + TILE_SIZE
+    if target < HEIGHT:
+        mimi.y = target
 def move_left():
-    mimi.x -= TILE_SIZE
+    target = mimi.x - TILE_SIZE
+    if target > 0:
+        mimi.x = target
 def move_right():
-    mimi.x += TILE_SIZE
+    target = mimi.x + TILE_SIZE
+    if target < WIDTH:
+        mimi.x = target
 
 def update():
+    
     if keyboard.up:
-        move_up()
+        clock.schedule_unique(move_up,0.05)
     elif keyboard.down:
-        move_down()
+        clock.schedule_unique(move_down,0.05)
+    elif keyboard.left:
+        clock.schedule_unique(move_left,0.05)
+    elif keyboard.right:
+        clock.schedule_unique(move_right,0.05)

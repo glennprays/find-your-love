@@ -60,3 +60,18 @@ def create_map():
             current_y = (TILE_SIZE * row)
             if current == 1:
                 screen.blit('dirt_block', (current_x, current_y))
+
+def move_up():
+    mimi.y -= TILE_SIZE
+def move_down():
+    mimi.y += TILE_SIZE
+def move_left():
+    mimi.x -= TILE_SIZE
+def move_right():
+    mimi.x += TILE_SIZE
+
+def update():
+    if keyboard.up:
+        move_up()
+    elif keyboard.down:
+        move_down()

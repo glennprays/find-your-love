@@ -1,9 +1,23 @@
 from pygame.locals import *
+from pgzero.actor import Actor
+from pgzero.loaders import sounds
 import pygame
 
 TILE_SIZE = 32 
 WIDTH = 20 * TILE_SIZE 
 HEIGHT = 20 * TILE_SIZE 
+
+START_POS_X = 1 * TILE_SIZE
+START_POS_Y = 19 * TILE_SIZE
+
+END_POS_X = 19 * TILE_SIZE
+END_POS_Y = 1 * TILE_SIZE
+
+MID_POS = 16.5
+mimi = Actor('mimi')
+mimi.pos = START_POS_X+MID_POS,START_POS_Y+MID_POS
+tata = Actor('tata')
+tata.pos = END_POS_X+MID_POS,END_POS_Y+MID_POS
 
 maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -28,11 +42,6 @@ maze = [
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ] 
 
-START_POS_X = 1 * TILE_SIZE
-START_POS_Y = 19 * TILE_SIZE
-
-END_POS_X = 19 * TILE_SIZE
-END_POS_Y = 1 * TILE_SIZE
 
 
 def draw():
@@ -40,6 +49,8 @@ def draw():
 
     screen.fill((70, 30, 50))
     create_map()
+    mimi.draw()
+    tata.draw()
 
 def create_map():
     for row in range(len(maze)):

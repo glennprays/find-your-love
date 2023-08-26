@@ -4,6 +4,7 @@ from pgzero.loaders import sounds
 import pygame
 from pgzero import clock
 import math
+import pygame.freetype
 
 TILE_SIZE = 32 
 WIDTH = 20 * TILE_SIZE 
@@ -44,14 +45,26 @@ maze = [
     [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ] 
 
+win = False
 
 def draw():
-    screen.clear()
+    text_x = WIDTH / 3 + 10
+    text_y = HEIGHT / 3
+    text_z = WIDTH / 2 - 175
+    text_k = HEIGHT / 2
 
-    screen.fill((70, 30, 50))
-    create_map()
-    tata.draw()
-    mimi.draw()
+    if win:
+        screen.fill((0, 0, 0))  # Latar belakang hitam saat pemain menang
+        screen.draw.text("You Win!", (text_x, text_y), color=(255, 255, 255), fontsize=75)
+        screen.draw.text("Thank you for helping Mimi found tata", (text_z, text_k), color=(255, 255, 255), fontsize=30)
+
+    else:
+        screen.clear()
+        screen.fill((70, 30, 50))
+        create_map()
+        tata.draw()
+        mimi.draw()
+
 
 def create_map():
     for row in range(len(maze)):
@@ -80,13 +93,17 @@ def move_right():
         mimi.x = target
 
 def update():
+    global win 
+
     coloumn = math.floor((mimi.x / TILE_SIZE))
     row = math.floor((mimi.y / TILE_SIZE))
     # TODO: FINISH WIN GAME
     if coloumn == 19 and row == 1:
-        exit() 
-        screen.clear()
-        screen.draw.text("You Win!", ((WIDTH/2), (HEIGHT/2)), color=(255,255,255), fontsize=70)
+        win = True 
+    
+    if win:
+        return
+        
 
     elif keyboard.up and row-1 >= 0:
         if maze[row-1][coloumn] == 0:

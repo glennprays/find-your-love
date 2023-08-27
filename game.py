@@ -19,7 +19,6 @@ MID_POS = TILE_SIZE / 2
 lose = False
 win = False
 
-
 def calculate_coordinate(row, column):
     x = column * TILE_SIZE
     y = row * TILE_SIZE
@@ -178,15 +177,16 @@ def update():
     global win, lose
     if win or lose:
         return
-
     # enemy collition check
     for key, enemy in enemies.items():
-        if enemy["actor"].distance_to(mimi) < TILE_SIZE:
+        if enemy["actor"].distance_to(mimi) < TILE_SIZE: 
+            sounds.hit.play()
             lose = True
             return
 
     # Finish
     if mimi.distance_to(tata) == 0:
+        sounds.finish.play()
         win = True
         return
 
@@ -299,12 +299,9 @@ def on_mouse_down(pos, button):
     global lose, win
     if win or lose:
         if button == mouse.LEFT:
-            if check_button_clicked(buttons["restart"], pos):
-                print("reset game")
-                set_game()
-            elif check_button_clicked(buttons["exit"], pos):
-                print("exit game")
-                exit()
+            for key, button in buttons.items():
+                if check_button_clicked(button, pos):
+                    button["callback"]()
         return
 
 

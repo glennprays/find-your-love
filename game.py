@@ -225,13 +225,22 @@ def gameover():
         fontsize=30,
     )
 
-    button_width = 180
+    button_width = 150
     button_height = 50
-    button_x = (WIDTH - button_width) / 2 + 20
+    button_x = (WIDTH - button_width) / 2 - 80
     button_y = (HEIGHT - button_height) / 2 + 80
 
     screen.draw.filled_rect(Rect(button_x, button_y, button_width, button_height), (0, 128, 0))
-    screen.draw.text("Restart", (button_x + 52, button_y + 15), color=(255, 255, 255), fontsize=30)
+    screen.draw.text("Restart", (button_x + 40, button_y + 15), color=(255, 255, 255), fontsize=30)
+
+    button_width = 150
+    button_height = 50
+    button_z = (WIDTH - button_width) / 2 + 100
+    button_k = (HEIGHT - button_height) / 2 + 80
+
+    screen.draw.filled_rect(Rect(button_z, button_k, button_width, button_height), (74, 177, 255))
+    screen.draw.text("Exit", (button_z + 52, button_k + 15), color=(255, 255, 255), fontsize=30)
+
 
 def enemy_move(enemy, direction, velocity):
     row = math.floor((enemy.y / TILE_SIZE))
@@ -292,30 +301,20 @@ def restart_game():
 
 def on_mouse_down(pos, button):
     global lose, win
-    if win:
+    if win or lose :
         if button == mouse.LEFT and check_restart_button_click(pos) == True:
             restart_game()
         elif button == mouse.LEFT and check_exit_button_click(pos) == True:
             exit()
 
-    elif lose:
-        if button == mouse.LEFT and check_restart_button_click(pos) == True:
-            restart_game()
-
 
 def check_restart_button_click(pos):
-    button_width = 180
-    button_height = 50
-    button_x = (WIDTH - button_width) / 2 + 20
-    button_y = (HEIGHT - button_height) / 2 + 80
-
     button_width2 = 150
     button_height2 = 50
-    button_z = (WIDTH - button_width) / 2 - 80
-    button_k = (HEIGHT - button_height) / 2 + 80
+    button_z = (WIDTH - button_width2) / 2 - 80
+    button_k = (HEIGHT - button_height2) / 2 + 80
     
     if (
-        (button_x <= pos[0] <= button_x + button_width and button_y <= pos[1] <= button_y + button_height ) or 
         (button_z <= pos[0] <= button_z + button_width2 and button_k <= pos[1] <= button_k + button_height2)
     ):
         return True

@@ -279,7 +279,6 @@ def enemy_move(enemy, direction, velocity):
             direction[0] = "down"
     elif direction[0] == "down":
         next = maze[row + 1][column]
-        threshold = calculate_coordinate(row, column)[1] + MID_POS
         enemy.y += velocity
         if next == 1 and enemy.y >= threshold_y:
             direction[0] = "up"

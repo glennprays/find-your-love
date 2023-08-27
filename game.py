@@ -15,22 +15,19 @@ HEIGHT = COLS * TILE_SIZE
 
 MID_POS = TILE_SIZE/2
 
-# for pausing game
-paused = False
-
-# 0 = way
-# 1 = wall
-# mimi = main character
-# tata = target character
-# enemy1 = enemy that move horizontal
-# enemy2 = enemy that move vertical
+# 0 (way)
+# 1 (wall)
+# mimi (main character)
+# tata (target character)
+# enemy1 (enemy that move horizontal)
+# enemy2 (enemy that move vertical)
 maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, "tata"],
-    [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-    [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "tata"],
+    [1, 0, 1, 1, 1, 1, 1, 0, 0, "enemy", 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 1, 1, 1, 1, "enemy", 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, "enemy2", 0, 0, 0, 0, 1, 1, 0, 1],
+    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, "enemy", 0, 0, 0, 0, 1, 1, 0, 1],
     [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1],
     [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1],
     [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1],
@@ -39,21 +36,47 @@ maze = [
     [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
     [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, "enemy", 1],
     [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, "enemy1", 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
+    [1, "enemy", 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
     [1, "mimi", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
+enemies = {
+    "enemy_1": {
+        "direction": ["left"],
+        "velocity": 1.2
+    },
+    "enemy_2": {
+        "direction": ["right"],
+        "velocity": 0.9
+    },
+    "enemy_3": {
+        "direction": ["right"],
+        "velocity": 1.8
+    },
+    "enemy_4": {
+        "direction": ["left"],
+        "velocity": 2.3
+    },
+    "enemy_5": {
+        "direction": ["up"],
+        "velocity": 1.6
+    },
+}
+enemies_direction = []
+
 mimi = Actor("mimi")
 tata = Actor("tata")
-enemy1 = Actor("jostrip")
-enemy1_direction = ["up"]
-enemy2 = Actor("jimot")
-enemy2_direction = ["right"]
 
+def calculate_coordinate(row, column):
+    x = column * TILE_SIZE
+    y = row * TILE_SIZE
+    return x,y
+
+enemy_count = 1
 # default Actor position
 for row in range(len(maze)):
     for col in range(len(maze[row])):
@@ -61,29 +84,37 @@ for row in range(len(maze)):
         pos = (col * TILE_SIZE)+MID_POS, (row * TILE_SIZE)+MID_POS
         if current == "mimi":
             mimi.pos = pos
-        if current == "tata":
+        elif current == "tata":
             tata.pos = pos
-        if current == "enemy1":
-            enemy1.pos = pos
-        if current == "enemy2":
-            enemy2.pos = pos
+        elif current == "enemy":
+            name = "enemy_"+str(enemy_count)
+            enemy = Actor(name)
+            pos = calculate_coordinate(row, col)
+            enemy.x = pos[0] + MID_POS
+            enemy.y = pos[1] + MID_POS
+            enemies[name]["actor"] = enemy
+            enemy_count += 1
 
+# win or lose check
+lose = False
+win = False
 
 def draw():
-    # winning checking
-    if mimi.distance_to(tata) == 0:
-        game_win()
-    # game over checking
-    elif enemy1.distance_to(mimi) == 0 or enemy2.distance_to(mimi) == 0:
+    global win, lose
+    if lose:
         gameover()
-    else:
-        screen.clear()
-        screen.fill((70, 30, 50))
-        draw_map()
-        tata.draw()
-        mimi.draw()
-        enemy1.draw()
-        enemy2.draw()
+        return
+    elif win:
+        game_win()
+        return
+    screen.clear()
+    screen.fill((70, 30, 50))
+    draw_map()
+    tata.draw()
+    mimi.draw()
+    
+    for key, enemy in enemies.items():
+        enemy['actor'].draw()
 
 def draw_map():
     for row in range(len(maze)):
@@ -95,7 +126,11 @@ def draw_map():
                 screen.blit("dirt_block", (current_x, current_y))
 
 def on_key_down(key):
-    # checking curren position
+    global win, lose
+    if win or lose:
+        return
+    
+    # checking current position
     row = math.floor((mimi.y / TILE_SIZE))
     column = math.floor((mimi.x / TILE_SIZE))
     if key == keys.LEFT and column > 0:
@@ -110,14 +145,28 @@ def on_key_down(key):
     move_actor(mimi, row, column)
 
 def update():
-    if paused:
+    global win, lose
+    if win or lose:
         return
     
-    enemy_move(enemy1, enemy1_direction)
-    enemy_move(enemy2, enemy2_direction)
+    # enemy collition check
+    for key, enemy in enemies.items():
+        if enemy["actor"].distance_to(mimi) < TILE_SIZE:
+            lose = True
+            return
+
+    # Finish
+    if mimi.distance_to(tata) == 0:
+        win = True
+        return
+
+    # enemy movement
+    for key, enemy in enemies.items():
+        enemy_move(enemy["actor"], enemy["direction"], enemy["velocity"])
 
 def move_actor(actor, row, column):
     # row and col start from 0 to n-1
+
     # calculate target x and y position
     X_POS = (column * TILE_SIZE) + MID_POS
     Y_POS = (row * TILE_SIZE) + MID_POS
@@ -127,8 +176,6 @@ def move_actor(actor, row, column):
         actor.pos = X_POS, Y_POS
 
 def game_win():
-    global paused
-    paused = True
     text_x = (WIDTH / 3) + 10
     text_y = HEIGHT / 3
     text_z = WIDTH / 2 - 175
@@ -139,7 +186,7 @@ def game_win():
         "You Win!", (text_x, text_y), color=(255, 255, 255), fontsize=75
     )
     screen.draw.text(
-        "Thank you for helping Mimi find tata",
+        "Thank you for helping Mimi find Tata",
         (text_z, text_k),
         color=(255, 255, 255),
         fontsize=30,
@@ -147,8 +194,6 @@ def game_win():
     
 
 def gameover():
-    global paused
-    paused = True
     text_x = (WIDTH / 3)
     text_y = HEIGHT / 3
     text_z = (WIDTH / 2)-100
@@ -165,32 +210,32 @@ def gameover():
         fontsize=30,
     )
 
-def enemy_move(enemy, direction):
-    # this enemy move verticaly
+def enemy_move(enemy, direction, velocity):
     row = math.floor((enemy.y / TILE_SIZE))
     column = math.floor((enemy.x / TILE_SIZE))
-    velocity = 1
+
     if direction[0] == "up":
         next = maze[row-1][column]
-        if next != 1:
-            enemy.y -= velocity
-        elif next == 1:
+        threshold = calculate_coordinate(row, column)[1] + MID_POS
+        enemy.y -= velocity
+        if next == 1 and enemy.y <= threshold:
             direction[0] = "down"
     elif direction[0] == "down":
         next = maze[row+1][column]
-        if next != 1:
-            enemy.y += velocity
-        elif next == 1:
+        threshold = calculate_coordinate(row, column)[1] + MID_POS
+        enemy.y += velocity
+        if next == 1 and enemy.y >= threshold:
             direction[0] = "up"
     elif direction[0] == "right":
         next = maze[row][column+1]
-        if next != 1:
-            enemy.x += velocity
-        elif next == 1:
+        threshold = calculate_coordinate(row, column)[0] + MID_POS
+        enemy.x += velocity
+        if next == 1 and enemy.x >= threshold:
             direction[0] = "left"
     elif direction[0] == "left":
         next = maze[row][column-1]
-        if next != 1:
-            enemy.x -= velocity
-        elif next == 1:
+        threshold = calculate_coordinate(row, column)[0] + MID_POS
+        enemy.x -= velocity
+        if next == 1 and enemy.x <= threshold:
             direction[0] = "right"
+

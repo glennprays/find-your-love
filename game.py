@@ -57,6 +57,11 @@ def set_algorithm_dfs():
     global use_bfs
     use_bfs = False
     set_game()  # Reset the game when switching algorithms
+
+def set_algorithm_ucs():
+    global use_ucs
+    use_ucs = False
+    set_game()
 """
 0 (way)
 1 (wall)
@@ -66,9 +71,9 @@ enemy (enemy that move horizontal and vertical)
 """
 maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "tata"],
-    [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-    [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "tata"],
+    [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
     [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
     [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1],
     [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1],
@@ -83,8 +88,8 @@ maze = [
     [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1],
     [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
     [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, "mimi", 1],
-    [1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+    [1, "mimi", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
 enemies = {
@@ -95,22 +100,11 @@ enemies = {
     "enemy_5": {"direction": ["up"], "velocity": 1.6},
 }
 use_bfs = True
+use_dfs = True
+use_ucs = True
 
 # text buttons with rectangle
 buttons = {
-    "restart": {
-        "width": 150,
-        "height": 50,
-        "x": (WIDTH - 150) / 2 - 80,
-        "y": (HEIGHT - 0) / 2 + 80,
-        "text": "Restart",
-        "font_size": 30,
-        "text_margin_top": 15,
-        "text_margin_left": 40,
-        "color": (255, 255, 255),
-        "bg_color": (74, 177, 255),
-        "callback": set_game,
-    },
     "exit": {
         "width": 150,
         "height": 50,
@@ -150,7 +144,20 @@ dfs_button = {
     "text_margin_top": 15,
     "text_margin_left": 52,
     "color": (255, 255, 255),
-    "bg_color": (0, 128, 0),  # Use a different color for the button
+    "bg_color": (0, 128, 0),
+}
+
+ucs_button = {
+    "width": 150,
+    "height": 50,
+    "x": (WIDTH - 150) / 2 - 80,
+    "y": (HEIGHT - 0) / 2 + 80,
+    "text": "UCS",
+    "font_size": 30,
+    "text_margin_top": 15,
+    "text_margin_left": 50,
+    "color": (255, 255, 255),
+    "bg_color": (0, 128, 0),
 }
 
 
@@ -161,13 +168,9 @@ set_game()
 
 
 def draw():
-    global win, lose
-    if lose:
-        gameover()
-        return
-    elif win:
-        game_win()
-        return
+    global win
+
+    game_win()
 
     screen.clear()
     screen.fill((70, 30, 50))
@@ -178,7 +181,7 @@ def draw():
     # Draw the algorithm switch buttons
     draw_button(bfs_button)
     draw_button(dfs_button)
-    draw_button(buttons["restart"])  # Move restart button
+    draw_button(ucs_button)
     draw_button(buttons["exit"])  # Move exit button
 
 
@@ -221,8 +224,10 @@ def update():
 
     if use_bfs:
         finish_game_with_bfs_nodes()  # Use BFS algorithm
-    else:
+    elif use_dfs :
         finish_game_with_dfs_nodes()  # Use DFS algorithm
+    else :
+        finish_game_with_ucs_nodes()
 
 def move_actor(actor, row, column):
     # row and col start from 0 to n-1
@@ -274,28 +279,28 @@ def game_win():
         color=(255, 255, 255),
         fontsize=30,
     )
-    draw_button(buttons["restart"])
+    draw_button(ucs_button)
     draw_button(buttons["exit"])
     draw_button(bfs_button)
     draw_button(dfs_button)
 
 
-def gameover():
-    text_x = WIDTH / 3
-    text_y = HEIGHT / 3
-    text_z = (WIDTH / 2) - 85
-    text_k = HEIGHT / 2
+# def gameover():
+#     text_x = WIDTH / 3
+#     text_y = HEIGHT / 3
+#     text_z = (WIDTH / 2) - 85
+#     text_k = HEIGHT / 2
 
-    screen.fill((0, 0, 0))  # make black backgroud
-    screen.draw.text("You Lose!", (text_x, text_y), color=(255, 255, 255), fontsize=75)
-    screen.draw.text(
-        "Got caught by enemy",
-        (text_z, text_k),
-        color=(255, 255, 255),
-        fontsize=30,
-    )
-    draw_button(buttons["restart"])
-    draw_button(buttons["exit"])
+#     screen.fill((0, 0, 0))  # make black backgroud
+#     screen.draw.text("You Lose!", (text_x, text_y), color=(255, 255, 255), fontsize=75)
+#     screen.draw.text(
+#         "Got caught by enemy",
+#         (text_z, text_k),
+#         color=(255, 255, 255),
+#         fontsize=30,
+#     )
+#     draw_button(buttons["ucs"])
+#     draw_button(buttons["exit"])
 
 
 # def enemy_move(enemy, direction, velocity):
@@ -338,6 +343,8 @@ def on_mouse_down(pos, button):
                 set_algorithm_bfs()  # Set algorithm to BFS
             if check_button_clicked(dfs_button, pos):
                 set_algorithm_dfs()  # Set algorithm to DFS
+            if check_button_clicked(ucs_button, pos):
+                set_algorithm_ucs()
 
 
 def check_button_clicked(button, pos):
@@ -530,3 +537,116 @@ def finish_game_with_dfs_nodes():
     # Check if mimi reached tata
     if mimi_row == tata_row and mimi_col == tata_col:
         win = True
+
+def ucs_shortest_path(graph, start, end):
+    priority_queue = PriorityQueue()
+    priority_queue.put((0, start))
+    visited = set()
+    path = []
+
+    while not priority_queue.empty():
+        cost, node = priority_queue.get()
+
+        if node == end:
+            return path, cost
+
+        if node in visited:
+            continue
+
+        visited.add(node)
+        path.append(node)
+
+        for neighbor, edge_cost in graph[node]:
+            if neighbor not in visited:
+                priority_queue.put((cost + edge_cost, neighbor))
+
+    return [], float('inf')
+
+def build_weighted_graph(maze):
+    graph = {}
+    rows = len(maze)
+    cols = len(maze[0])
+
+    for row in range(rows):
+        for col in range(cols):
+            if maze[row][col] != 1:
+                node = (row, col)
+                neighbors = []
+
+                costs = {
+                    "right": 3,
+                    "left": 3,
+                    "up": 5,
+                    "down": 10,
+                }
+
+                directions = [("right", (0, 1)), ("left", (0, -1)), ("up", (-1, 0)), ("down", (1, 0))]
+
+                for direction, (dx, dy) in directions:
+                    new_row, new_col = row + dx, col + dy
+                    if 0 <= new_row < rows and 0 <= new_col < cols and maze[new_row][new_col] != 1:
+                        neighbors.append(((new_row, new_col), costs[direction]))
+
+                graph[node] = neighbors
+
+    return graph
+
+# Inisialisasi variabel lainnya
+
+def finish_game_with_ucs_nodes():
+    global lose, win
+
+    if win or lose:
+        return
+
+    mimi_row = math.floor(mimi.y / TILE_SIZE)
+    mimi_col = math.floor(mimi.x / TILE_SIZE)
+
+    tata_row = math.floor(tata.y / TILE_SIZE)
+    tata_col = math.floor(tata.x / TILE_SIZE)
+
+    graph = build_weighted_graph(maze)
+
+    mimi_node = (mimi_row, mimi_col)
+    tata_node = (tata_row, tata_col)
+
+    shortest_path_nodes, shortest_path_cost = ucs_shortest_path(graph, mimi_node, tata_node)
+
+    if shortest_path_cost != float('inf'):
+        total_cost = 0
+
+        for i in range(len(shortest_path_nodes) - 1):
+            current_node = shortest_path_nodes[i]
+            next_node = shortest_path_nodes[i + 1]
+            edge_cost = get_edge_cost(graph, current_node, next_node)
+            total_cost += edge_cost 
+
+            # Move mimi to the next node
+            target_x = next_node[1] * TILE_SIZE + MID_POS
+            target_y = next_node[0] * TILE_SIZE + MID_POS
+
+            step_x = (target_x - mimi.x) / 5
+            step_y = (target_y - mimi.y) / 5
+
+            for _ in range(5):
+                mimi.x += step_x
+                mimi.y += step_y
+
+                screen.clear()
+                screen.fill((70, 30, 50))
+                draw_map()
+                tata.draw()
+                mimi.draw()
+                pygame.display.flip()
+                time.sleep(0.01)
+
+        print("Total cost :", total_cost)
+
+    if mimi_row == tata_row and mimi_col == tata_col:
+        win = True
+
+def get_edge_cost(graph, node1, node2):
+    for neighbor, edge_cost in graph[node1]:
+        if neighbor == node2:
+            return edge_cost
+    return float('inf')

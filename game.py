@@ -331,9 +331,26 @@ def build_tree(maze):
 def move_by_path(shortest_path_finder, build_tree):
     mimi_node, tata_node = build_tree(maze)
 
-    shortest_path_nodes = shortest_path_finder(mimi_node, tata_node)
+    shortest_path_nodes, calculate_path = shortest_path_finder(mimi_node, tata_node)
 
-    if shortest_path_nodes:
+    if shortest_path_nodes and calculate_path:
+        path_list = []
+        for path in calculate_path:
+            path_list.append(path)
+            draw_element()
+            draw_path("heart_empty", path_list)
+            pygame.display.flip()
+            time.sleep(0.02)
+
+        short_path_list = []
+        for path in shortest_path_nodes:
+            short_path_list.append(path)
+            draw_element()
+            draw_path("heart_empty", path_list)
+            draw_path("heart_full", short_path_list)
+            pygame.display.flip()
+            time.sleep(0.02)
+
         shortest_path = [(node.x, node.y) for node in shortest_path_nodes]
 
         for row, col in shortest_path:
@@ -348,6 +365,10 @@ def move_by_path(shortest_path_finder, build_tree):
                 mimi.y += step_y
 
                 draw_element()
+                draw_path("heart_empty", path_list)
+                draw_path("heart_full", short_path_list)
+                mimi.draw()
+                tata.draw()
                 pygame.display.flip()
 
                 clock.tick(30)
@@ -357,18 +378,19 @@ def move_by_path(shortest_path_finder, build_tree):
 
 def draw_path(type, path_list):
     for path in path_list:
-        screen.blit(type, (path.x, path.y))
+        screen.blit(type, (path.y * TILE_SIZE, path.x * TILE_SIZE))
 
 
 def bfs_shortest_path(start, end):
     queue = deque([(start, [])])
     visited = set()
+    calculate_path = []
 
     while queue:
         node, path = queue.popleft()
 
         if node == end:
-            return path
+            return path, calculate_path
 
         if node in visited:
             continue
@@ -376,18 +398,21 @@ def bfs_shortest_path(start, end):
         visited.add(node)
 
         for neighbor in node.neighbors:
+            if neighbor not in calculate_path:
+                calculate_path.append(neighbor)
             queue.append((neighbor, path + [neighbor]))
 
 
 def dfs_shortest_path(start, end):
     stack = [(start, [])]
     visited = set()
+    calculate_path = []
 
     while stack:
         node, path = stack.pop()
 
         if node == end:
-            return path
+            return path, calculate_path
 
         if node in visited:
             continue
@@ -395,6 +420,8 @@ def dfs_shortest_path(start, end):
         visited.add(node)
 
         for neighbor in node.neighbors:
+            if neighbor not in calculate_path:
+                calculate_path.append(neighbor)
             stack.append((neighbor, path + [neighbor]))
 
 

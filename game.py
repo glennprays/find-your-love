@@ -1,3 +1,5 @@
+import heapq
+from collections import deque
 from queue import PriorityQueue
 from pygame.locals import *
 from pgzero.actor import Actor
@@ -80,21 +82,21 @@ def set_algorithm_ucs():
 maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
     [1, 0, 4, 4, 4, 4, 0, 6, 1, 0, 4, 4, 5, 5, 6, 6, 5, 4, 0, 3],
-    [1, 0, 1, 1, 1, 1, 1, 0, 1, 4, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-    [1, 4, 1, 1, 1, 1, 1, 0, 1, 4, 1, 0, 1, 6, 1, 4, 0, 0, 4, 1],
+    [1, 0, 1, 1, 1, 1, 1, 6, 1, 4, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 4, 1, 1, 1, 1, 1, 6, 1, 4, 1, 0, 1, 6, 1, 4, 0, 0, 4, 1],
     [1, 4, 4, 5, 6, 6, 6, 6, 5, 4, 1, 0, 1, 6, 1, 4, 1, 1, 4, 1],
-    [1, 1, 1, 1, 1, 0, 1, 5, 1, 1, 1, 0, 0, 5, 0, 4, 1, 1, 5, 1],
-    [1, 0, 0, 6, 0, 0, 1, 4, 1, 1, 1, 1, 1, 5, 1, 1, 1, 6, 6, 1],
-    [1, 1, 1, 6, 1, 1, 1, 4, 1, 4, 4, 0, 1, 5, 0, 0, 1, 0, 1, 1],
-    [1, 1, 1, 6, 1, 1, 1, 4, 1, 5, 1, 4, 1, 4, 1, 1, 1, 0, 0, 1],
-    [1, 5, 6, 6, 1, 0, 0, 0, 6, 6, 1, 4, 0, 4, 1, 1, 1, 1, 0, 1],
-    [1, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 5, 1, 1, 1, 1, 0, 1, 0, 1],
-    [1, 5, 5, 5, 4, 4, 1, 5, 0, 0, 1, 6, 1, 0, 0, 0, 0, 1, 4, 1],
-    [1, 4, 1, 1, 1, 1, 1, 4, 1, 1, 1, 6, 1, 0, 1, 1, 1, 1, 4, 1],
-    [1, 4, 1, 1, 1, 1, 1, 4, 4, 5, 6, 6, 0, 0, 1, 1, 1, 1, 4, 1],
-    [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 5, 5, 4, 1],
-    [1, 5, 1, 5, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 4, 4, 5, 1, 1, 1],
-    [1, 4, 5, 4, 4, 6, 1, 0, 0, 0, 1, 1, 4, 1, 1, 1, 5, 1, 1, 1],
+    [1, 1, 1, 1, 1, 6, 1, 5, 1, 1, 1, 0, 0, 5, 0, 4, 1, 1, 5, 1],
+    [1, 0, 0, 6, 0, 6, 1, 6, 1, 1, 1, 1, 1, 5, 1, 1, 1, 6, 6, 1],
+    [1, 1, 1, 6, 1, 1, 1, 6, 1, 4, 4, 0, 1, 5, 0, 0, 1, 0, 1, 1],
+    [1, 1, 1, 6, 1, 1, 1, 6, 1, 5, 1, 4, 1, 4, 1, 1, 1, 0, 0, 1],
+    [1, 5, 6, 6, 1, 6, 6, 0, 6, 6, 1, 4, 0, 4, 1, 1, 1, 1, 0, 1],
+    [1, 5, 1, 1, 1, 6, 1, 5, 1, 1, 1, 5, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 6, 6, 6, 6, 6, 1, 5, 0, 0, 1, 6, 1, 0, 0, 0, 0, 1, 0, 1],
+    [1, 6, 1, 1, 1, 1, 1, 4, 1, 1, 1, 6, 1, 0, 1, 1, 1, 1, 0, 1],
+    [1, 6, 1, 1, 1, 1, 1, 4, 4, 5, 6, 6, 0, 0, 1, 1, 1, 1, 0, 1],
+    [1, 6, 6, 6, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 5, 5, 6, 1],
+    [1, 5, 1, 5, 1, 1, 1, 5, 5, 5, 1, 1, 0, 0, 4, 4, 5, 1, 1, 1],
+    [1, 4, 5, 4, 4, 6, 1, 5, 5, 5, 1, 1, 4, 1, 1, 1, 5, 1, 1, 1],
     [1, 1, 1, 1, 1, 4, 1, 0, 1, 1, 1, 1, 4, 1, 5, 1, 6, 1, 0, 1],
     [1, 5, 5, 5, 6, 4, 4, 4, 5, 6, 6, 5, 5, 4, 4, 1, 5, 4, 0, 1],
     [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
@@ -190,13 +192,10 @@ def draw():
 
 def update():
     if use_bfs:
-        print("bfs")
         finish_game_with_bfs_nodes()
     elif use_dfs:
-        print("dfs")
         finish_game_with_dfs_nodes()
     elif use_ucs:
-        print("ucs")
         finish_game_with_ucs_nodes()
 
 
@@ -209,7 +208,6 @@ def on_mouse_down(pos, button):
         for key, button in buttons.items():
             if check_button_clicked(button, pos):
                 button["callback"]()
-                print("clicked", key)
 
 
 def check_button_clicked(button, pos):
@@ -217,26 +215,6 @@ def check_button_clicked(button, pos):
         button["x"] <= pos[0] <= button["x"] + button["width"]
         and button["y"] <= pos[1] <= button["y"] + button["height"]
     )
-
-
-def move_actor(actor, row, column):
-    # row and col start from 0 to n-1
-
-    # calculate target x and y position
-    X_POS = (column * TILE_SIZE) + MID_POS
-    Y_POS = (row * TILE_SIZE) + MID_POS
-
-    # prevent out of screen and wall checking
-    if (
-        X_POS >= 0
-        and X_POS <= WIDTH
-        and Y_POS > 0
-        and Y_POS <= HEIGHT
-        and maze[row][column] != 1
-    ):
-        actor.pos = X_POS, Y_POS
-
-        print(X_POS, Y_POS)
 
 
 def draw_button(button):
@@ -286,11 +264,6 @@ def menu_screen():
     draw_button(buttons["exit"])
 
 
-from collections import deque
-
-# ... (previous code remains unchanged)
-
-
 class Node:
     def __init__(self, row, col, cost):
         self.row = row
@@ -302,6 +275,9 @@ class Node:
         if self.row != other.row:
             return self.row < other.row
         return self.col < other.col
+
+    def add_neighbor(self, neighbor):
+        self.neighbors.append(neighbor)
 
 
 def build_tree(maze):
@@ -347,7 +323,7 @@ def build_tree(maze):
     return mimi_node, tata_node
 
 
-def move_by_path(shortest_path_finder, build_tree):
+def move_by_path(shortest_path_finder, build_tree, show_cost=False):
     mimi_node, tata_node = build_tree(maze)
 
     shortest_path_nodes, calculate_path = shortest_path_finder(mimi_node, tata_node)
@@ -362,13 +338,18 @@ def move_by_path(shortest_path_finder, build_tree):
             time.sleep(0.02)
 
         short_path_list = []
+        cost = 0
         for path in shortest_path_nodes:
+            cost += path.cost
             short_path_list.append(path)
             draw_element()
             draw_path("heart_empty", path_list)
             draw_path("heart_full", short_path_list)
             pygame.display.flip()
             time.sleep(0.02)
+
+        if show_cost:
+            print(f"\033[93;1mTOTAL COST:\033[0m {cost}")
 
         shortest_path = [(node.row, node.col) for node in shortest_path_nodes]
 
@@ -444,6 +425,33 @@ def dfs_shortest_path(start, end):
             stack.append((neighbor, path + [neighbor]))
 
 
+def ucs_shortest_path(root, target):
+    priority_queue = [(root.cost, root)]
+    visited = {root: root.cost}
+    parents = {}
+    visited_nodes = []
+
+    while priority_queue:
+        current_cost, current_node = heapq.heappop(priority_queue)
+        visited_nodes.append(current_node)
+
+        if current_node == target:
+            path = []
+            while current_node:
+                path.append(current_node)
+                current_node = parents.get(current_node)
+            return list(reversed(path)), visited_nodes
+
+        for neighbor in current_node.neighbors:
+            neighbor_cost = current_cost + neighbor.cost
+            if neighbor not in visited or neighbor_cost < visited[neighbor]:
+                visited[neighbor] = neighbor_cost
+                parents[neighbor] = current_node
+                heapq.heappush(priority_queue, (neighbor_cost, neighbor))
+
+    return None, visited_nodes
+
+
 def finish_game_with_bfs_nodes():
     global use_bfs
     move_by_path(bfs_shortest_path, build_tree)
@@ -456,40 +464,7 @@ def finish_game_with_dfs_nodes():
     use_dfs = False
 
 
-def ucs_shortest_path(start, end):
-    priority_queue = PriorityQueue()
-    priority_queue.put((0, start))
-    visited = set()
-    calculate_path = []
-
-    custom_costs = {
-        (-1, 0): 13,  # move left
-        (1, 0): 12,  # move right
-        (0, -1): 10,  # move up
-        (0, 1): 11,  # move down
-    }
-
-    while not priority_queue.empty():
-        cost, node = priority_queue.get()
-
-        if node == end:
-            return calculate_path, calculate_path
-
-        if node in visited:
-            continue
-
-        visited.add(node)
-
-        for neighbor in node.neighbors:
-            if neighbor not in calculate_path:
-                calculate_path.append(neighbor)
-            d_row = neighbor.row - node.row
-            d_col = neighbor.col - node.col
-            step_cost = custom_costs.get((d_row, d_col), 1)
-            priority_queue.put((cost + step_cost, neighbor))
-
-
 def finish_game_with_ucs_nodes():
     global use_ucs
-    move_by_path(ucs_shortest_path, build_tree)
+    move_by_path(ucs_shortest_path, build_tree, show_cost=True)
     use_ucs = False

@@ -17,8 +17,10 @@ HEIGHT = COLS * TILE_SIZE
 
 MID_POS = TILE_SIZE / 2
 
+TILES = ["cost_1", "wall", "mimi", "tata", "cost_4", "cost_5", "cost_6"]
 
-def calculate_actor_coordinate(row, column):
+
+def calculate_actor_coordinate(column, row):
     x = column * TILE_SIZE + MID_POS
     y = row * TILE_SIZE + MID_POS
     return x, y
@@ -40,9 +42,9 @@ def set_game():
         for col in range(len(maze[row])):
             current = maze[row][col]
             pos = (col * TILE_SIZE) + MID_POS, (row * TILE_SIZE) + MID_POS
-            if current == "mimi":
+            if current == 2:
                 mimi.pos = pos
-            elif current == "tata":
+            elif current == 3:
                 tata.pos = pos
 
 
@@ -67,32 +69,35 @@ def set_algorithm_ucs():
 
 
 """
-0 (way)
+0 (cost 1)
 1 (wall)
-mimi (main character)
-tata (target character)
+2 (mimi main character)
+3 (tata target character)
+4 (cost 4)
+5 (cost 5)
+6 (cost 6)
 """
 maze = [
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, "tata"],
-    [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
-    [1, 0, 1, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 0, 0, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 1, 0, 1],
-    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 0, 1],
-    [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1],
-    [1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1, 1, 1, 0, 0, 1],
-    [1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0, 0, 0, 0, 1, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 0, 1],
-    [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1],
-    [1, 0, 1, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1],
-    [1, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
-    [1, 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 1],
-    [1, "mimi", 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+    [1, 0, 4, 4, 4, 4, 0, 6, 1, 0, 4, 4, 5, 5, 6, 6, 5, 4, 0, 3],
+    [1, 0, 1, 1, 1, 1, 1, 0, 1, 4, 1, 0, 1, 0, 1, 1, 1, 1, 1, 1],
+    [1, 4, 1, 1, 1, 1, 1, 0, 1, 4, 1, 0, 1, 6, 1, 4, 0, 0, 4, 1],
+    [1, 4, 4, 5, 6, 6, 6, 6, 5, 4, 1, 0, 1, 6, 1, 4, 1, 1, 4, 1],
+    [1, 1, 1, 1, 1, 0, 1, 5, 1, 1, 1, 0, 0, 5, 0, 4, 1, 1, 5, 1],
+    [1, 0, 0, 6, 0, 0, 1, 4, 1, 1, 1, 1, 1, 5, 1, 1, 1, 6, 6, 1],
+    [1, 1, 1, 6, 1, 1, 1, 4, 1, 4, 4, 0, 1, 5, 0, 0, 1, 0, 1, 1],
+    [1, 1, 1, 6, 1, 1, 1, 4, 1, 5, 1, 4, 1, 4, 1, 1, 1, 0, 0, 1],
+    [1, 5, 6, 6, 1, 0, 0, 0, 6, 6, 1, 4, 0, 4, 1, 1, 1, 1, 0, 1],
+    [1, 5, 1, 1, 1, 4, 1, 5, 1, 1, 1, 5, 1, 1, 1, 1, 0, 1, 0, 1],
+    [1, 5, 5, 5, 4, 4, 1, 5, 0, 0, 1, 6, 1, 0, 0, 0, 0, 1, 4, 1],
+    [1, 4, 1, 1, 1, 1, 1, 4, 1, 1, 1, 6, 1, 0, 1, 1, 1, 1, 4, 1],
+    [1, 4, 1, 1, 1, 1, 1, 4, 4, 5, 6, 6, 0, 0, 1, 1, 1, 1, 4, 1],
+    [1, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 4, 5, 5, 4, 1],
+    [1, 5, 1, 5, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 4, 4, 5, 1, 1, 1],
+    [1, 4, 5, 4, 4, 6, 1, 0, 0, 0, 1, 1, 4, 1, 1, 1, 5, 1, 1, 1],
+    [1, 1, 1, 1, 1, 4, 1, 0, 1, 1, 1, 1, 4, 1, 5, 1, 6, 1, 0, 1],
+    [1, 5, 5, 5, 6, 4, 4, 4, 5, 6, 6, 5, 5, 4, 4, 1, 5, 4, 0, 1],
+    [1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
 ]
 
 
@@ -152,8 +157,8 @@ buttons = {
     },
 }
 
-mimi = Actor("mimi")
-tata = Actor("tata")
+mimi = Actor(TILES[2])
+tata = Actor(TILES[3])
 
 
 def draw_element():
@@ -170,8 +175,10 @@ def draw_map():
             current = maze[row][col]
             current_x = TILE_SIZE * col
             current_y = TILE_SIZE * row
-            if current == 1:
-                screen.blit("dirt_block", (current_x, current_y))
+            tile = 0
+
+            if current != 2 and current != 3:
+                screen.blit(TILES[current], (current_x, current_y))
 
 
 def draw():
@@ -285,15 +292,17 @@ from collections import deque
 
 
 class Node:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
+    def __init__(self, row, col, cost):
+        self.row = row
+        self.col = col
         self.neighbors = []
-    
+        self.cost = cost
+
     def __lt__(self, other):
-        if self.x != other.x:
-            return self.x < other.x
-        return self.y < other.y
+        if self.row != other.row:
+            return self.row < other.row
+        return self.col < other.col
+
 
 def build_tree(maze):
     tree = [[None for _ in row] for row in maze]
@@ -302,29 +311,35 @@ def build_tree(maze):
 
     for row in range(len(maze)):
         for col in range(len(maze[row])):
-            if maze[row][col] == "mimi":
+            current = maze[row][col]
+            if current == 2:
                 mimi_row, mimi_col = row, col
 
-            if maze[row][col] == "tata":
+            if current == 3:
                 tata_row, tata_col = row, col
 
-            if maze[row][col] != 1:
-                node = Node(row, col)
+            if current != 1:
+                cost = 0
+                if current == 0:
+                    cost = 1
+                elif current != 2 and current != 3:
+                    cost = current
+                node = Node(row, col, cost)
                 nodes.append(node)
                 tree[row][col] = node
 
     for node in nodes:
-        x, y = node.x, node.y
+        row, col = node.row, node.col
         directions = [(0, -1), (0, 1), (-1, 0), (1, 0)]
 
-        for dx, dy in directions:
-            new_x, new_y = x + dx, y + dy
+        for d_row, d_col in directions:
+            new_row, new_col = row + d_row, col + d_col
             if (
-                0 <= new_x < len(maze)
-                and 0 <= new_y < len(maze[0])
-                and maze[new_x][new_y] != 1
+                0 <= new_row < len(maze)
+                and 0 <= new_col < len(maze[0])
+                and maze[new_row][new_col] != 1
             ):
-                node.neighbors.append(tree[new_x][new_y])
+                node.neighbors.append(tree[new_row][new_col])
 
     mimi_node = tree[mimi_row][mimi_col]
     tata_node = tree[tata_row][tata_col]
@@ -355,14 +370,14 @@ def move_by_path(shortest_path_finder, build_tree):
             pygame.display.flip()
             time.sleep(0.02)
 
-        shortest_path = [(node.x, node.y) for node in shortest_path_nodes]
+        shortest_path = [(node.row, node.col) for node in shortest_path_nodes]
 
         for row, col in shortest_path:
-            target_x, target_y = calculate_actor_coordinate(row, col)
+            target_col, target_row = calculate_actor_coordinate(col, row)
 
             steps = 10
-            step_x = (target_x - mimi.x) / steps
-            step_y = (target_y - mimi.y) / steps
+            step_x = (target_col - mimi.x) / steps
+            step_y = (target_row - mimi.y) / steps
 
             for _ in range(steps):
                 mimi.x += step_x
@@ -380,10 +395,9 @@ def move_by_path(shortest_path_finder, build_tree):
     time.sleep(0.5)
 
 
-
 def draw_path(type, path_list):
     for path in path_list:
-        screen.blit(type, (path.y * TILE_SIZE, path.x * TILE_SIZE))
+        screen.blit(type, (path.col * TILE_SIZE, path.row * TILE_SIZE))
 
 
 def bfs_shortest_path(start, end):
@@ -441,6 +455,7 @@ def finish_game_with_dfs_nodes():
     move_by_path(dfs_shortest_path, build_tree)
     use_dfs = False
 
+
 def ucs_shortest_path(start, end):
     priority_queue = PriorityQueue()
     priority_queue.put((0, start))
@@ -449,9 +464,9 @@ def ucs_shortest_path(start, end):
 
     custom_costs = {
         (-1, 0): 13,  # move left
-        (1, 0): 12,   # move right
+        (1, 0): 12,  # move right
         (0, -1): 10,  # move up
-        (0, 1): 11,   # move down
+        (0, 1): 11,  # move down
     }
 
     while not priority_queue.empty():
@@ -468,10 +483,11 @@ def ucs_shortest_path(start, end):
         for neighbor in node.neighbors:
             if neighbor not in calculate_path:
                 calculate_path.append(neighbor)
-            dx = neighbor.x - node.x
-            dy = neighbor.y - node.y
-            step_cost = custom_costs.get((dx, dy), 1)
+            d_row = neighbor.row - node.row
+            d_col = neighbor.col - node.col
+            step_cost = custom_costs.get((d_row, d_col), 1)
             priority_queue.put((cost + step_cost, neighbor))
+
 
 def finish_game_with_ucs_nodes():
     global use_ucs

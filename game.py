@@ -289,7 +289,11 @@ class Node:
         self.x = x
         self.y = y
         self.neighbors = []
-
+    
+    def __lt__(self, other):
+        if self.x != other.x:
+            return self.x < other.x
+        return self.y < other.y
 
 def build_tree(maze):
     tree = [[None for _ in row] for row in maze]
@@ -376,6 +380,7 @@ def move_by_path(shortest_path_finder, build_tree):
     time.sleep(0.5)
 
 
+
 def draw_path(type, path_list):
     for path in path_list:
         screen.blit(type, (path.y * TILE_SIZE, path.x * TILE_SIZE))
@@ -436,131 +441,39 @@ def finish_game_with_dfs_nodes():
     move_by_path(dfs_shortest_path, build_tree)
     use_dfs = False
 
-
-def ucs_shortest_path(graph, start, end):
+def ucs_shortest_path(start, end):
     priority_queue = PriorityQueue()
     priority_queue.put((0, start))
     visited = set()
-    path = []
+    calculate_path = []
+
+    custom_costs = {
+        (-1, 0): 13,  # move left
+        (1, 0): 12,   # move right
+        (0, -1): 10,  # move up
+        (0, 1): 11,   # move down
+    }
 
     while not priority_queue.empty():
         cost, node = priority_queue.get()
 
         if node == end:
-            return path, cost
+            return calculate_path, calculate_path
 
         if node in visited:
             continue
 
         visited.add(node)
-        path.append(node)
 
-        for neighbor, edge_cost in graph[node]:
-            if neighbor not in visited:
-                priority_queue.put((cost + edge_cost, neighbor))
-
-    return [], float("inf")
-
-
-def build_weighted_graph(maze):
-    graph = {}
-    rows = len(maze)
-    cols = len(maze[0])
-
-    for row in range(rows):
-        for col in range(cols):
-            if maze[row][col] != 1:
-                node = (row, col)
-                neighbors = []
-
-                costs = {
-                    "right": 3,
-                    "left": 3,
-                    "up": 5,
-                    "down": 10,
-                }
-
-                directions = [
-                    ("right", (0, 1)),
-                    ("left", (0, -1)),
-                    ("up", (-1, 0)),
-                    ("down", (1, 0)),
-                ]
-
-                for direction, (dx, dy) in directions:
-                    new_row, new_col = row + dx, col + dy
-                    if (
-                        0 <= new_row < rows
-                        and 0 <= new_col < cols
-                        and maze[new_row][new_col] != 1
-                    ):
-                        neighbors.append(((new_row, new_col), costs[direction]))
-
-                graph[node] = neighbors
-
-    return graph
-
-
-# Inisialisasi variabel lainnya
-
+        for neighbor in node.neighbors:
+            if neighbor not in calculate_path:
+                calculate_path.append(neighbor)
+            dx = neighbor.x - node.x
+            dy = neighbor.y - node.y
+            step_cost = custom_costs.get((dx, dy), 1)
+            priority_queue.put((cost + step_cost, neighbor))
 
 def finish_game_with_ucs_nodes():
-    global lose, win
-
-    if win or lose:
-        return
-
-    mimi_row = math.floor(mimi.y / TILE_SIZE)
-    mimi_col = math.floor(mimi.x / TILE_SIZE)
-
-    tata_row = math.floor(tata.y / TILE_SIZE)
-    tata_col = math.floor(tata.x / TILE_SIZE)
-
-    graph = build_weighted_graph(maze)
-
-    mimi_node = (mimi_row, mimi_col)
-    tata_node = (tata_row, tata_col)
-
-    shortest_path_nodes, shortest_path_cost = ucs_shortest_path(
-        graph, mimi_node, tata_node
-    )
-
-    if shortest_path_cost != float("inf"):
-        total_cost = 0
-
-        for i in range(len(shortest_path_nodes) - 1):
-            current_node = shortest_path_nodes[i]
-            next_node = shortest_path_nodes[i + 1]
-            edge_cost = get_edge_cost(graph, current_node, next_node)
-            total_cost += edge_cost
-
-            # Move mimi to the next node
-            target_x = next_node[1] * TILE_SIZE + MID_POS
-            target_y = next_node[0] * TILE_SIZE + MID_POS
-
-            step_x = (target_x - mimi.x) / 5
-            step_y = (target_y - mimi.y) / 5
-
-            for _ in range(5):
-                mimi.x += step_x
-                mimi.y += step_y
-
-                screen.clear()
-                screen.fill((70, 30, 50))
-                draw_map()
-                tata.draw()
-                mimi.draw()
-                pygame.display.flip()
-                time.sleep(0.01)
-
-        print("Total cost :", total_cost)
-
-    if mimi_row == tata_row and mimi_col == tata_col:
-        win = True
-
-
-def get_edge_cost(graph, node1, node2):
-    for neighbor, edge_cost in graph[node1]:
-        if neighbor == node2:
-            return edge_cost
-    return float("inf")
+    global use_ucs
+    move_by_path(ucs_shortest_path, build_tree)
+    use_ucs = False
